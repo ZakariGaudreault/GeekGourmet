@@ -8,6 +8,8 @@ A collaborative classroom project for Web Programming II, a team effort involvin
 - Add an .env file in the backend with the content below.
 - Run both projects
 
+## How to use?
+
 .env file details -> 
 MONGODB_PWD="ktTLP9Xk04MiCbuh"
 URL_PRE="mongodb+srv://geekgourmet:"
