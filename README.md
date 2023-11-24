@@ -2,13 +2,15 @@
 
 A collaborative classroom project for Web Programming II, a team effort involving three individuals, provided me with an invaluable opportunity to significantly augment my proficiency in a range of technologies, including React, MongoDB, JavaScript, HTML, and CSS. Through the development of a comprehensive website, the project encapsulated key functionalities such as user authentication, the implementation of customizable user settings, and the establishment of an intuitively navigable interface tailored to meet the needs of the average user. This hands-on experience not only broadened my technical skill set but also deepened my understanding of creating dynamic and user-friendly web applications.
 
+
+## How to use?
+
 - To run the website, download the project which includes the backend and frontend.
 - Open the two folders in Visual Studio.
 - Run 'npm i' in both projects to install the modules.
 - Add an .env file in the backend with the content below.
 - Run both projects
 
-## How to use?
 
 .env file details -> 
 MONGODB_PWD="ktTLP9Xk04MiCbuh"
