@@ -1,0 +1,223 @@
+.App {
+    text-align: center;
+    background-color: rgb(255, 207, 215);
+    height: 100%;
+    min-height: 4000px;
+}
+h1{
+    font-weight: bold;
+    color: black;
+}
+h2{
+    font-weight: bold;
+    color: black;
+}
+h4{
+    font-weight: bold;
+    color: black;
+}
+
+
+
+.header{
+    margin-bottom: 10px;
+}
+
+body{
+    background: pink;
+    height: 100%;
+}
+
+button{
+    color: rgb(0, 0, 0);
+}
+.buttonIngredients{
+    margin-left: 5px;
+}
+.buttonBook{
+    margin-left: 5px;
+}
+
+input::placeholder {
+    color: rgb(253, 131, 204);
+}
+
+textarea::placeholder {
+    color: rgb(253, 131, 204);
+}
+
+.MealOfTheWeek{
+    margin-left: 50px;
+    width: 42%;
+    border: 5px solid rgb(0, 0, 0);
+    background-color: rgb(249, 242, 206);
+    padding: 10px;
+    margin-bottom: 50px;
+    margin-top: 5px;
+    max-height: 835px;
+}
+.Trend{
+    margin: auto;
+    width: 45%;
+    background-color: rgb(200, 211, 141);
+    padding: 10px;
+    margin-bottom: 50px;
+    margin-top: 5px;
+}
+.TrendVideo{
+    border: 5px solid rgb(0, 0, 0);
+    margin: auto;
+    width: 90%;
+    background-color: rgb(200, 211, 141);
+    padding: 10px;
+    margin-bottom: 50px;
+    margin-top: 5px;
+}
+.TrendCulture{
+    border: 5px solid rgb(0, 0, 0);
+    margin: auto;
+    width: 90%;
+    background-color: rgb(200, 211, 141);
+    background-image: url("https://i.imgur.com/srL7zIy.jpg");
+    background-size: 1550px 1200px;
+    padding: 10px;
+    margin-bottom: 50px;
+    margin-top: 5px;
+}
+.Extra{
+    border: 5px solid rgb(0, 0, 0);
+    margin: auto;
+    width: 90%;
+    background-color: rgb(200, 211, 141);
+    padding: 10px;
+    margin-bottom: 50px;
+    margin-top: 5px;
+}
+
+.centerTrend {
+    display: flex;
+    margin: auto;
+    width: 97%;
+    border: 5px solid rgb(0, 0, 0);
+    background-color: rgb(200, 211, 141);
+    padding: 10px;
+    margin-bottom: 50px;
+    margin-top: 50px;
+}
+
+.centerVideos {
+    display: flex;
+    margin: auto;
+    width: 90%;
+    border: 3px solid rgb(255, 255, 255);
+    background-color: rgb(200, 211, 141);
+    padding: 20px;
+    margin-bottom: 50px;
+    margin-top: 50px;
+}
+
+
+.center {
+ 
+    margin: auto;
+    width: 90%;
+    border: 5px solid rgb(0, 0, 0);
+    background-color: rgb(200, 211, 141);
+    padding: 10px;
+    margin-bottom: 50px;
+    margin-top: 50px;
+}
+
+.centerUpdate {
+ 
+    margin: auto;
+    width: 90%;
+    background-color: rgb(200, 211, 141);
+    padding: 10px;
+ 
+}
+
+
+.centerCard {
+    min-width: 250px;
+    min-height: 100px;
+    border: 5px solid rgb(0, 0, 0);
+    background-color: rgb(255, 246, 189);
+    padding-right: 20px;
+    margin-bottom: 25px;
+    margin-left: 10px;
+}
+.centerCardVideo {
+    min-width: 250px;
+    min-height: 100px;
+    border: 5px solid rgb(0, 0, 0);
+    background-color: rgb(255, 246, 189);
+    padding-right: 30px;
+    margin-bottom: 25px;
+    padding-top: 2%;
+    padding-left: 20px;
+}
+.centerTrendingCard {
+    min-width: 250px;
+    min-height: 100px;
+    border: 5px solid rgb(0, 0, 0);
+    background-color: rgb(255, 246, 189);
+    padding-right: 20px;
+    margin-bottom: 25px;
+    margin-left: 20px;
+}
+.centerTitle {
+   font-size: 16px;
+   font-weight: bold;
+   font-family:'Times New Roman', Times, serif;
+   color: black;
+   
+}
+.centerTitleCulture {
+    padding: 50px;
+    font-size: 16px;
+    font-weight: bold;
+    font-family:'Times New Roman', Times, serif;
+    color: black;
+    
+ }
+.cardText {
+    font-size: 14px;
+    font-weight: bold;
+    font-family:'Times New Roman', Times, serif;
+    color: black;
+ }
+
+#simpleText{
+    padding: 20px;
+    padding-left: 280px;
+    padding-right: 280px;
+}
+
+label {
+    padding: 12px 12px 12px 12px;
+    display: inline-block;
+    width: 25%;
+    margin-top: 6px;
+    text-align: center;
+}
+
+input, textarea{
+    width: 50%;
+    margin-top: 6px;
+    font-family: Arial, sans-serif;
+}
+
+footer{
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+}
+
+
+
+
+
+

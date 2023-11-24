@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: sessionController.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: sessionController.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const express = require("express");
+const { Session, createSession, getSession, deleteSession } = require("./Session")
+const router = express.Router(); 
+const routeRoot = "/session";
+const {checkCredentials} = require("./userAccountsController");
+const logger = require('../logger');
+
+router.post("/login", loginUser);
+/**
+ * Verifies the users and logs them in
+ * 
+ * @param {object} request request object with the body containing the username and password 
+ * @param {object} response response object that sens 200 status when log in is successful. Otherwise, 401.
+ * @returns 
+ */
+async function loginUser(request, response) {
+    try{
+        const username = request.body.username;
+        const password = request.body.password;
+    
+        if(username &amp;&amp; password) {
+            if(await checkCredentials(username, password)){
+                logger.info("Successfully logged in for " + username);
+    
+                // Create a session object that will expire in 20 minutes
+                const sessionId = createSession(username, 30); 
+    
+                    // Save cookie that will expire.
+                response.cookie("sessionId", sessionId, { expires: getSession(sessionId).expiresAt , httpOnly: true});
+                response.sendStatus(200);
+                return;
+            }
+            else{
+                logger.error("Unsuccessfully logged in for " + username);
+            }
+        }
+        else{
+            logger.error("Unsuccessfully logged in for " + username);
+        }
+        response.sendStatus(401);    
+    }
+    catch(e){
+        logger.error("Unsuccessfully logged in");
+        response.sendStatus(401);    
+    }
+};
+
+/**
+ * Authenticates the users
+ * 
+ * @param {object} request request object that contains the cookie information
+ * @returns session information
+ */
+function authenticateUser(request) {
+    // If this request doesn't have any cookies, that means it isn't authenticated. Return null.
+    if (!request.cookies) {
+        return null;
+    }
+    
+    // We can obtain the session token from the requests cookies, which come with every request
+    const sessionId = request.cookies['sessionId']
+    if (!sessionId) {
+    // If the cookie is not set, return null
+    return null;
+    }
+
+    // We then get the session of the user from our session map
+    userSession = getSession(sessionId);
+    if (!userSession) {
+        return null;
+    }
+
+    // If the session has expired, delete the session from our map and return null
+    if (userSession.isExpired()) {
+    deleteSession(sessionId);
+        return null;
+    }
+
+    return {sessionId, userSession}; // Successfully validated.
+}
+
+/**
+ * Refreshes the session
+ * 
+ * @param {object} request request object that contains cookie information
+ * @param {object} response response object that contains the new cookie information
+ * @returns new session id
+ */
+function refreshSession(request, response) {
+    const authenticatedSession = authenticateUser(request);
+        if (!authenticatedSession) {
+    response.sendStatus(401); // Unauthorized access
+    return;
+    }
+    // Create and store a new Session object that will expire in 2 minutes.
+    const newSessionId = createSession(authenticatedSession.userSession.username, 2);
+    // Delete the old entry in the session map 
+    deleteSession(authenticatedSession.sessionId);
+    
+    // Set the session cookie to the new id we generated, with a
+    // renewed expiration time
+    response.cookie("sessionId", newSessionId, { expires: getSession(newSessionId).expiresAt, httpOnly: true })
+    return newSessionId;
+}
+
+router.get('/logout', logoutUser);
+/**
+ * Logouts the current user
+ * 
+ * @param {object} request request object that contains the cookie information
+ * @param {object} response response object that has erased the cookie
+ */
+function logoutUser(request, response) {
+    const authenticatedSession = authenticateUser(request);
+    if (!authenticatedSession) {
+        response.sendStatus(401); // Unauthorized access
+        return;
+    }
+    deleteSession(authenticatedSession.sessionId)
+    console.log("Logged out user " + authenticatedSession.userSession.username);
+    
+    // "erase" cookie by forcing it to expire.
+    response.cookie("sessionId", "", { expires: new Date() , httpOnly: true}); 
+    response.sendStatus(200);
+};
+
+router.get("/auth", authUser);
+function authUser(request, response) {
+  try {
+    const authenticatedSession = authenticateUser(request);
+    if (!authenticatedSession) {
+      response.sendStatus(401);
+    } else {
+      response.sendStatus(200);
+    }
+  } catch (error) {
+    response.sendStatus(401);
+  }
+}
+    
+    
+module.exports = { router, routeRoot, loginUser, authenticateUser, refreshSession};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#authenticateUser">authenticateUser</a></li><li><a href="global.html#checkCredentials">checkCredentials</a></li><li><a href="global.html#createAccount">createAccount</a></li><li><a href="global.html#createRecipe">createRecipe</a></li><li><a href="global.html#createSession">createSession</a></li><li><a href="global.html#deleteAccount">deleteAccount</a></li><li><a href="global.html#deleteRecipe">deleteRecipe</a></li><li><a href="global.html#deleteSession">deleteSession</a></li><li><a href="global.html#editDisplayName">editDisplayName</a></li><li><a href="global.html#editPassword">editPassword</a></li><li><a href="global.html#editUsername">editUsername</a></li><li><a href="global.html#getSession">getSession</a></li><li><a href="global.html#loginUser">loginUser</a></li><li><a href="global.html#logoutUser">logoutUser</a></li><li><a href="global.html#refreshSession">refreshSession</a></li><li><a href="global.html#sendError">sendError</a></li><li><a href="global.html#showAccount">showAccount</a></li><li><a href="global.html#showAllAccounts">showAllAccounts</a></li><li><a href="global.html#showAllRecipeBookOfOneUser">showAllRecipeBookOfOneUser</a></li><li><a href="global.html#showOneRecipe">showOneRecipe</a></li><li><a href="global.html#showOneRecipeById">showOneRecipeById</a></li><li><a href="global.html#showRecipes">showRecipes</a></li><li><a href="global.html#showRecipesOfOneUser">showRecipesOfOneUser</a></li><li><a href="global.html#updateRecipe">updateRecipe</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri May 19 2023 07:33:23 GMT-0400 (Eastern Daylight Saving Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

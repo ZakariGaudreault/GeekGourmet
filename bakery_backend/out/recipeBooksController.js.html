@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: recipeBooksController.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: recipeBooksController.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const express = require('express');
+const router = express.Router();
+const routeRoot = '/book';
+const logger = require('../logger.js');
+const recipeBooksModel = require("../models/recipeBooksModel.js");
+const model = require('../models/recipeBooksModel.js');
+const DatabaseError  = require('../models/databaseError.js');
+const  InvalidInputError  = require('../models/invalidInputError.js');
+const {authenticateUser, refreshSession} = require('./sessionController.js');
+
+/**
+ * Adds a recipe book into the database and sends a response status depending of the result
+ * being positive or negative 
+ * @param {*} response the response object from the server
+ * @param {*} request the request object from the server
+ */
+router.post('/', addBook);
+async function addBook(request, response) {
+    try{
+
+        const authenticatedSession = authenticateUser(request);
+        if (!authenticatedSession) {
+            response.sendStatus(401); // Unauthorized access
+            return;
+        }
+        refreshSession(request, response);
+
+    const added = await model.addBook(authenticatedSession.userSession.username, request.body.name);
+    if(added){
+    response.status("200");
+    response.send(added)
+    }
+    else{
+        response.status("400");
+        response.send("failed to add recipe book");
+    }
+    }
+    catch(err)
+    {
+        console.log("Failed to add a recipe book: " + err.message);
+        if(err instanceof DatabaseError){
+            response.status("500");
+            response.send({ errMessage: "system error while trying to add recipe book: "+ err.message});
+        }
+        else if(err instanceof InvalidInputError){
+            response.status("400");
+            response.send({ errMessage: "Validation error while trying to add recipe book: "+ err.message});
+        }
+        else{
+            response.status("500");
+            response.send({ errMessage: "Unexpected error while trying to add recipe book: "+ err.message});
+        }
+        
+    }
+}
+
+
+/**
+ * gets a recipe book from the database and sends a response status depending of the result
+ * being positive or negative
+ * @param {*} response the response object from the server
+ * @param {*} request the request object from the server
+ */
+router.get('/user/:name', findBook);
+async function findBook(request, response) {
+    try{
+
+        const authenticatedSession = authenticateUser(request);
+        if (!authenticatedSession) {
+            response.sendStatus(401); // Unauthorized access
+            return;
+        }
+        refreshSession(request, response);
+
+        let answer = await model.getSingleRecipeBook(authenticatedSession.userSession.username, request.params.name)
+    
+        if(answer != null){
+            response.status("200");
+            response.send(answer)
+            }
+            else{
+                response.status("400");
+                response.send({ errMessage: "Validation error while trying to find recipe book: " + request.params.name + " does not exist"});
+            }
+    
+        }
+        catch(err)
+        {
+            console.log("Failed to delete a recipe: " + err.message);
+            if(err instanceof DatabaseError){
+                response.status("500");
+                response.send({ errMessage: "system error while trying to find recipe book: "+ err.message});
+            }
+            else if(err instanceof InvalidInputError){
+                response.status("400");
+                response.send({ errMessage: "Validation error while trying to find recipe book: "+ err.message});
+            }
+            else{
+                response.status("500");
+                response.send({ errMessage: "Unexpected error while trying to find recipe book: "+ err.message});
+            }
+            
+        }
+}
+
+/**
+ * find all the recipe books from the database and sends a response status depending of the result
+ * being positive or negative
+ * @param {*} response the response object from the server
+ * @param {*} request the request object from the server
+ */
+router.get('/', findAllBooks);
+async function findAllBooks(request, response) {
+    try{
+
+        const authenticatedSession = authenticateUser(request);
+        if (!authenticatedSession) {
+            response.sendStatus(401); // Unauthorized access
+            return;
+        }
+        refreshSession(request, response);
+
+    let answer = await model.getAllRecipeBooks()
+ 
+    if(answer != null){
+        response.status("200");
+        response.send(answer)
+    }
+
+    else{
+    response.send("There is no recipe book in the database currently");
+    }
+
+    }
+    catch(err)
+    {
+        if(err instanceof DatabaseError){
+            response.status("500");
+            response.send("system error while trying to get all recipes book: "+ err.message);
+        }
+        else if(err instanceof InvalidInputError){
+            response.status("400");
+            response.send("Validation error while trying to get all find recipes book" + err.message);
+        }
+        else{
+            response.status("500");
+            response.send("unexpected error while trying to get all find recipes book: "+ err.message);
+        }
+    }
+}
+
+router.get("/user", showAllRecipeBookOfOneUser);
+/**
+ * Gets all the recipes book of one user
+ * @param {*} response the response object from the server
+ * @param {*} request the request object from the server
+ */
+async function showAllRecipeBookOfOneUser(request, response){
+    try{
+
+        const authenticatedSession = authenticateUser(request);
+        if (!authenticatedSession) {
+            response.sendStatus(401); // Unauthorized access
+            return;
+        }
+        refreshSession(request, response);
+
+    let answer = await model.getAllRecipeBooksOfUser(authenticatedSession.userSession.username)
+ 
+    if(answer != null){
+        response.status("200");
+        response.send(answer)
+    }
+
+    else{
+    response.send("This is user does not have any recipe books.");
+    }
+
+    }
+    catch(err)
+    {
+        if(err instanceof DatabaseError){
+            response.status("500");
+            response.send("system error while trying to get all recipes book: "+ err.message);
+        }
+        else if(err instanceof InvalidInputError){
+            response.status("400");
+            response.send("Validation error while trying to get all find recipes book" + err.message);
+        }
+        else{
+            response.status("500");
+            response.send("unexpected error while trying to get all find recipes book: "+ err.message);
+        }
+    }
+
+}
+
+/**
+ * delete a recipe book into the database and sends a response status depending of the result
+ * being positive or negative
+ * @param {*} response the response object from the server
+ * @param {*} request the request object from the server
+ */
+router.delete('/', deleteBook);
+async function deleteBook(request, response) {
+    try{
+
+        const authenticatedSession = authenticateUser(request);
+        if (!authenticatedSession) {
+            response.sendStatus(401); // Unauthorized access
+            return;
+        }
+        refreshSession(request, response);
+
+    let answer = await model.deleteRecipeBook(authenticatedSession.userSession.username, request.body.name)
+
+    if(answer.deletedCount == 1){
+        response.status("200");
+        response.send(answer)
+        }
+        else{
+            response.status("400");
+            response.send({ errMessage: "Validation error while trying to delete the recipe book: " + request.body.name + " because it does not exist"});
+        }
+
+    }
+    catch(err)
+    {
+        console.log("Failed to delete a recipe book: " + err.message);
+        if(err instanceof DatabaseError){
+            response.status("500");
+            response.send({ errMessage: "system error while trying to delete recipe book: "+ err.message});
+        }
+        else if(err instanceof InvalidInputError){
+            response.status("400");
+            response.send({ errMessage: "Validation error while trying to delete recipe book: "+ err.message});
+        }
+        else{
+            response.status("500");
+            response.send({ errMessage: "Unexpected error while trying to delete recipe book: "+ err.message});
+        }
+        
+    }
+}
+
+
+/**
+ * update a recipe book name into the database and sends a response status depending of the result
+ * being positive or negative
+ * @param {*} response the response object from the server
+ * @param {*} request the request object from the server
+ */
+router.put('/name', updateBookName);
+async function updateBookName(request, response) {
+    try{
+
+        const authenticatedSession = authenticateUser(request);
+        if (!authenticatedSession) {
+            response.sendStatus(401); // Unauthorized access
+            return;
+        }
+        refreshSession(request, response);
+
+    let answer = await model.updateRecipeBookName(authenticatedSession.userSession.username, request.body.name,request.body.newName)
+
+    if(answer.modifiedCount != 0){
+        response.status("200");
+        const recipe =  await model.getSingleRecipeBook(authenticatedSession.userSession.username, request.body.newName);
+        response.send(recipe);
+    }
+
+    else{
+        response.status("400");
+        response.send({ errMessage: "Validation error while trying to update recipe book: " + request.body.name + " does not exist or the new name is invalid"});
+    }
+
+    }
+    catch(err)
+    {
+        console.log("Failed to delete a recipe: " + err.message);
+        if(err instanceof DatabaseError){
+            response.status("500");
+            response.send({ errMessage: "system error while trying to update recipe book: "+ err.message});
+        }
+        else if(err instanceof InvalidInputError){
+            response.status("400");
+            response.send({ errMessage: "Validation error while trying to update recipe book: "+ err.message});
+        }
+        else{
+            response.status("500");
+            response.send({ errMessage: "Unexpected error while trying to update recipe book: "+ err.message});
+        }
+    }
+}
+
+/**
+ * update a recipe book content by adding a recipe in the saved recipes into the database and sends a response status depending of the result
+ * being positive or negative
+ * @param {*} response the response object from the server
+ * @param {*} request the request object from the server
+ */
+router.put('/content/new', addRecipeInBook);
+async function addRecipeInBook(request, response) {
+    try{
+
+        const authenticatedSession = authenticateUser(request);
+        if (!authenticatedSession) {
+            response.sendStatus(401); // Unauthorized access
+            return;
+        }
+        refreshSession(request, response);
+
+        let answer = await model.updateBookAddRecipe(authenticatedSession.userSession.username, request.body.name,request.body.recipeId)
+    
+        if(answer.modifiedCount != 0){
+            response.status("200");
+            const recipe =  await model.getSingleRecipeBook(authenticatedSession.userSession.username, request.body.name);
+            response.send(recipe);
+        }
+    
+        else{
+            response.status("400");
+            response.send({ errMessage: "Validation error while trying to update recipe book : " + request.body.name + " does not exist or the new content is invalid"});
+        }
+    
+        }
+        catch(err)
+        {
+            console.log("Failed to delete a recipe: " + err.message);
+            if(err instanceof DatabaseError){
+                response.status("500");
+                response.send({ errMessage: "system error while trying to update recipe book: "+ err.message});
+            }
+            else if(err instanceof InvalidInputError){
+                response.status("400");
+                response.send({ errMessage: "Validation error while trying to update recipe book: "+ err.message});
+            }
+            else{
+                response.status("500");
+                response.send({ errMessage: "Unexpected error while trying to update recipe book: "+ err.message});
+            }
+        }
+    
+}
+
+/**
+ * update a recipe book name by deleting a recipe in the saved recipes into the database and sends a response status depending of the result
+ * being positive or negative
+ * @param {*} response the response object from the server
+ * @param {*} request the request object from the server
+ */
+router.put('/content/removal', deleteRecipeInBook);
+async function deleteRecipeInBook(request, response) {
+    try{
+
+        const authenticatedSession = authenticateUser(request);
+        if (!authenticatedSession) {
+            response.sendStatus(401); // Unauthorized access
+            return;
+        }
+        refreshSession(request, response);
+
+        let answer = await model.updateBookDeleteRecipe(authenticatedSession.userSession.username, request.body.name,request.body.recipeId)
+    
+        if(answer.modifiedCount != 0){
+            response.status("200");
+            const recipe =  await model.getSingleRecipeBook(authenticatedSession.userSession.username, request.body.name);
+            response.send(recipe);
+        }
+    
+        else{
+            response.status("400");
+            response.send({ errMessage: "Validation error while trying to update recipe book : " + request.body.name + " does not exist or the new content is invalid"});
+        }
+    
+        }
+        catch(err)
+        {
+            console.log("Failed to delete a recipe: " + err.message);
+            if(err instanceof DatabaseError){
+                response.status("500");
+                response.send({ errMessage: "system error while trying to update recipe book: "+ err.message});
+            }
+            else if(err instanceof InvalidInputError){
+                response.status("400");
+                response.send({ errMessage: "Validation error while trying to update recipe book: "+ err.message});
+            }
+            else{
+                response.status("500");
+                response.send({ errMessage: "Unexpected error while trying to update recipe book: "+ err.message});
+            }
+        }
+    
+}
+
+
+
+module.exports = {
+    router,
+    routeRoot,
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#authenticateUser">authenticateUser</a></li><li><a href="global.html#checkCredentials">checkCredentials</a></li><li><a href="global.html#createAccount">createAccount</a></li><li><a href="global.html#createRecipe">createRecipe</a></li><li><a href="global.html#createSession">createSession</a></li><li><a href="global.html#deleteAccount">deleteAccount</a></li><li><a href="global.html#deleteRecipe">deleteRecipe</a></li><li><a href="global.html#deleteSession">deleteSession</a></li><li><a href="global.html#editDisplayName">editDisplayName</a></li><li><a href="global.html#editPassword">editPassword</a></li><li><a href="global.html#editUsername">editUsername</a></li><li><a href="global.html#getSession">getSession</a></li><li><a href="global.html#loginUser">loginUser</a></li><li><a href="global.html#logoutUser">logoutUser</a></li><li><a href="global.html#refreshSession">refreshSession</a></li><li><a href="global.html#sendError">sendError</a></li><li><a href="global.html#showAccount">showAccount</a></li><li><a href="global.html#showAllAccounts">showAllAccounts</a></li><li><a href="global.html#showAllRecipeBookOfOneUser">showAllRecipeBookOfOneUser</a></li><li><a href="global.html#showOneRecipe">showOneRecipe</a></li><li><a href="global.html#showOneRecipeById">showOneRecipeById</a></li><li><a href="global.html#showRecipes">showRecipes</a></li><li><a href="global.html#showRecipesOfOneUser">showRecipesOfOneUser</a></li><li><a href="global.html#updateRecipe">updateRecipe</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri May 19 2023 07:33:23 GMT-0400 (Eastern Daylight Saving Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
