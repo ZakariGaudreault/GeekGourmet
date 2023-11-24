@@ -1,6 +1,8 @@
 ## What is Geek Gourmet?
 
-A collaborative classroom project for Web Programming II, a team effort involving three individuals, provided me with an invaluable opportunity to significantly augment my proficiency in a range of technologies, including React, MongoDB, JavaScript, HTML, and CSS. Through the development of a comprehensive website, the project encapsulated key functionalities such as user authentication, the implementation of customizable user settings, and the establishment of an intuitively navigable interface tailored to meet the needs of the average user. This hands-on experience not only broadened my technical skill set but also deepened my understanding of creating dynamic and user-friendly web applications.
+A classroom project involving three people allowed us to enhance our knowledge about React, MongoDB,
+JavaScript, HTML, and CSS by creating a website with features like user authentication, customizable user 
+settings, and an easy navigation for the average user.
 
 
 ## How to use?
