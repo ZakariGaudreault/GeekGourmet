@@ -1,6 +1,6 @@
 ## What is Geek Gourmet?
 
-A classroom project involving three people allowed us to enhance our knowledge about React, MongoDB,
+A classroom project for web programming II involving three people allowed us to enhance our knowledge about React, MongoDB,
 JavaScript, HTML, and CSS by creating a website with features like user authentication, customizable user 
 settings, and an easy navigation for the average user.
 
